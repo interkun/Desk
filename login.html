@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Login - Creatorkun</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .form-transition { transition: all 0.3s ease-in-out; }
+        .hidden-field { display: none; opacity: 0; transform: translateY(-10px); }
+        .visible-field { display: block; opacity: 1; transform: translateY(0); }
+    </style>
+</head>
+<body class="bg-slate-50 h-screen flex items-center justify-center p-4">
+
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-xl p-8 border border-slate-100">
+        
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <img src="logo/logo.png">
+            
+            <h2 id="pageTitle" class="text-xl font-semibold text-slate-800 mt-4">Welcome Back</h2>
+            <p id="pageSubtitle" class="text-slate-500 text-sm mt-1">Enter your details to sign in</p>
+        </div>
+
+        <!-- Form -->
+        <form id="authForm" onsubmit="handleAuth(event)" class="space-y-4">
+            
+            <!-- Full Name (Signup ke liye) -->
+            <div id="nameField" class="hidden-field form-transition">
+                <label class="block text-sm font-medium text-slate-700 mb-1">Full Name</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-user text-slate-400"></i>
+                    </div>
+                    <input type="text" id="fullName" 
+                        class="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        placeholder="John Doe">
+                </div>
+            </div>
+
+            <!-- Email -->
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Email Address</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-envelope text-slate-400"></i>
+                    </div>
+                    <input type="email" id="email" required 
+                        class="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        placeholder="name@example.com">
+                </div>
+            </div>
+
+            <!-- Password -->
+            <div>
+                <div class="flex justify-between items-center mb-1">
+                    <label class="block text-sm font-medium text-slate-700">Password</label>
+                    <a href="#" id="forgotPass" class="text-xs text-blue-600 hover:underline">Forgot password?</a>
+                </div>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-lock text-slate-400"></i>
+                    </div>
+                    <input type="password" id="password" required 
+                        class="w-full pl-10 pr-10 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        placeholder="••••••••">
+                    <button type="button" onclick="togglePassword()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
+                        <i class="fas fa-eye" id="eyeIcon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" id="submitBtn"
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-blue-200 transition-all transform active:scale-95 flex items-center justify-center gap-2 mt-2">
+                <span>Sign In</span>
+                <i class="fas fa-arrow-right"></i>
+            </button>
+
+        </form>
+
+        <!-- Divider -->
+        <div class="my-6 flex items-center justify-center gap-3">
+            <div class="h-px bg-slate-200 flex-1"></div>
+            <span class="text-slate-400 text-xs font-medium uppercase">Or</span>
+            <div class="h-px bg-slate-200 flex-1"></div>
+        </div>
+
+        <!-- Google Button -->
+        <button onclick="handleGoogleLogin()" type="button" class="w-full bg-white border border-slate-200 text-slate-700 font-medium py-3 rounded-xl hover:bg-slate-50 transition-colors flex items-center justify-center gap-3 active:bg-slate-100">
+            <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="h-5 w-5" alt="Google">
+            <span>Continue with Google</span>
+        </button>
+
+        <!-- Toggle Link -->
+        <p class="text-center text-slate-600 text-sm mt-8">
+            <span id="toggleText">Don't have an account?</span> 
+            <button onclick="toggleMode()" class="text-blue-600 font-semibold hover:underline ml-1" id="toggleBtn">Create account</button>
+        </p>
+       <div class="mt-4 text-center border-t border-slate-100 pt-3">
+    <p class="text-[10px] text-slate-400 font-medium leading-relaxed">
+        By continuing, you agree to our <br>
+        <a href="Static/terms" class="text-slate-500 hover:text-blue-600 hover:underline transition font-semibold">Terms & Conditions</a> and 
+        <a href="../../Static/privacy" class="text-slate-500 hover:text-blue-600 hover:underline transition font-semibold">Privacy Policy</a>
+    </p>
+</div>
+    </div>
+
+    <!-- UI LOGIC SCRIPT (Yeh bina external file ke chalega) -->
+    <script>
+        // Default mode
+        let isLoginMode = true;
+
+        // Toggle Login/Signup
+        function toggleMode() {
+            isLoginMode = !isLoginMode;
+            
+            const nameField = document.getElementById('nameField');
+            const pageTitle = document.getElementById('pageTitle');
+            const pageSubtitle = document.getElementById('pageSubtitle');
+            const submitBtn = document.getElementById('submitBtn');
+            const toggleText = document.getElementById('toggleText');
+            const toggleBtn = document.getElementById('toggleBtn');
+            const forgotPass = document.getElementById('forgotPass');
+
+            if (isLoginMode) {
+                // Login Mode Dikhao
+                nameField.className = 'hidden-field form-transition';
+                pageTitle.innerText = 'Welcome Back';
+                pageSubtitle.innerText = 'Enter your details to sign in';
+                submitBtn.innerHTML = '<span>Sign In</span><i class="fas fa-arrow-right"></i>';
+                toggleText.innerText = "Don't have an account?";
+                toggleBtn.innerText = 'Create account';
+                forgotPass.style.display = 'block';
+            } else {
+                // Signup Mode Dikhao
+                nameField.className = 'visible-field form-transition';
+                pageTitle.innerText = 'Create Account';
+                pageSubtitle.innerText = 'Get started with your free account';
+                submitBtn.innerHTML = '<span>Sign Up</span><i class="fas fa-user-plus"></i>';
+                toggleText.innerText = 'Already have an account?';
+                toggleBtn.innerText = 'Sign In';
+                forgotPass.style.display = 'none';
+            }
+        }
+
+        // Password Show/Hide
+        function togglePassword() {
+            const input = document.getElementById('password');
+            const icon = document.getElementById('eyeIcon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
+    </script>
+
+    <!-- FIREBASE LOGIC (Yeh actual Login ke liye zaroori hai) -->
+    <script type="module">
+        // Agar aapne firebase.js file nahi banayi, toh yeh code error de sakta hai.
+        // Lekin upar wala 'Create Account' button ab zaroor chalega.
+        
+        import { auth, googleProvider } from "./js/firebase.js";
+        import { 
+            createUserWithEmailAndPassword, 
+            signInWithEmailAndPassword, 
+            signInWithPopup, 
+            updateProfile, 
+            onAuthStateChanged 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        // Form Submit Handler
+        window.handleAuth = async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const fullName = document.getElementById('fullName').value;
+            const submitBtn = document.getElementById('submitBtn');
+
+            const originalBtnContent = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Processing...';
+            submitBtn.disabled = true;
+
+            try {
+                if (isLoginMode) {
+                    // Login Logic
+                    await signInWithEmailAndPassword(auth, email, password);
+                } else {
+                    // Signup Logic
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    await updateProfile(userCredential.user, {
+                        displayName: fullName
+                    });
+                }
+            } catch (error) {
+                console.error(error);
+                alert("Error: " + error.message);
+                submitBtn.innerHTML = originalBtnContent;
+                submitBtn.disabled = false;
+            }
+        };
+        // Google Login Handler
+        window.handleGoogleLogin = async function() {
+            try {
+                await signInWithPopup(auth, googleProvider);
+            } catch (error) {
+                console.error(error);
+                alert("Google Sign-In Failed: " + error.message);
+            }
+        };
+
+        // Redirect on Success
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                window.location.href = 'index.html';
+            }
+        });
+    </script>
+    <script type="module" src="js/auth.js"></script>
+</body>
+</html>
