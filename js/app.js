@@ -2,7 +2,7 @@
 
 import { auth } from "./firebase.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import { getUserPlanDetails } from "./services/db-service.js";
+;
 
 // --- CONFIGURATION & CACHE ---
 const CACHE = new Map(); // HTML Cache to make it super fast
@@ -224,4 +224,5 @@ window.toggleSidebar = function(forceClose = false) {
 
 window.logout = async function() {
     if(confirm("Are you sure you want to logout?")) await signOut(auth);
+
 };
