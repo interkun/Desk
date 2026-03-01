@@ -13,13 +13,12 @@ import {
 } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
 // --- 1. SECURITY CHECK (Sabse Zaroori) ---
-// Yeh function har page load par check karega ki banda login hai ya nahi
 onAuthStateChanged(auth, (user) => {
     const currentPath = window.location.pathname;
     
-    // Check karo ki hum abhi Login page par hain ya Dashboard par
-    // Note: Aapke file ka naam 'login.html' ya 'auth.html' ho sakta hai
-    const isLoginPage = currentPath.includes('login.html') || currentPath.includes('auth.html');
+    // FIX: Humne '.html' hata diya hai taaki Cloudflare ke Clean URLs ke sath kaam kare.
+    // Exact path root '/' bhi check kar sakte hain agar dashboard wahan ho.
+    const isLoginPage = currentPath.includes('login') || currentPath.includes('auth');
 
     if (user) {
         // CASE: User Login hai
@@ -27,11 +26,9 @@ onAuthStateChanged(auth, (user) => {
 
         // Agar user login hai aur galti se Login page par baitha hai, toh usko Dashboard bhejo
         if (isLoginPage) {
-            window.location.href = 'index.html';
+            // Cloudflare par 'index.html' ki jagah root '/' use karna better hai
+            window.location.replace('/'); 
         }
-
-        // Agar Dashboard par hai, toh UI mein naam update kar sakte hain (Optional)
-        // updateUserNameInUI(user);
         
     } else {
         // CASE: User Login NAHI hai
@@ -39,8 +36,8 @@ onAuthStateChanged(auth, (user) => {
 
         // Agar user login nahi hai aur Dashboard kholne ki koshish kar raha hai
         if (!isLoginPage) {
-            // Toh wapas Login page par phek do
-            window.location.href = 'login.html';
+            // Wapas Login page par bhejo (Clean URL format)
+            window.location.replace('/login'); 
         }
     }
 });
