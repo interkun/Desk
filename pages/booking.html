@@ -1,0 +1,115 @@
+<div class="w-full max-w-7xl mx-auto space-y-6 animate-fade-in pb-24">
+
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white/80 backdrop-blur-md p-6 rounded-3xl border border-slate-200 shadow-sm">
+        <div>
+            <h1 class="text-xl md:text-2xl font-black text-slate-800 mb-1">Bookings &#128197;</h1>
+            <div class="flex items-center gap-2">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                    <span id="stat-total">0</span> Total Sessions
+                </p>
+                <button onclick="window.loadBooking()" class="text-slate-400 hover:text-blue-600 transition text-xs">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="relative w-full md:w-72">
+            <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-slate-400 text-xs"></i>
+            <input type="text" onkeyup="window.handleSearch(event)" placeholder="Search client or service..." 
+                class="w-full pl-10 pr-4 py-3 rounded-2xl bg-white border border-slate-200 outline-none text-xs font-bold focus:ring-4 focus:ring-slate-100/50 transition shadow-sm">
+        </div>
+    </div>
+
+    <div class="flex items-center justify-between px-2 overflow-x-auto no-scrollbar">
+    <div class="flex bg-white p-1.5 rounded-2xl border border-slate-200 shadow-sm gap-1 min-w-max">
+        <button onclick="window.filterBookings('pending', this)" id="tab-pending" 
+            class="filter-tab px-5 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 bg-slate-900 text-white shadow-md">
+            Pending <span id="badge-pending" class="ml-1 bg-orange-500 text-white px-1.5 rounded-full text-[9px] hidden">0</span>
+        </button>
+        
+        <button onclick="window.filterBookings('confirmed', this)" id="tab-confirmed" 
+            class="filter-tab px-5 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 text-slate-500 hover:bg-slate-50">
+            Upcoming
+        </button>
+        
+        <button onclick="window.filterBookings('completed', this)" id="tab-completed" 
+            class="filter-tab px-5 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 text-slate-500 hover:bg-slate-50">
+            History
+        </button>
+        
+        <button onclick="window.filterBookings('cancelled', this)" id="tab-cancelled" 
+            class="filter-tab px-5 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 text-slate-500 hover:bg-slate-50">
+            Cancelled
+        </button>
+    </div>
+</div>
+
+    <div class="px-1">
+        <div id="booking-loader" class="hidden flex flex-col items-center justify-center py-24">
+            <div class="w-10 h-10 border-4 border-slate-100 border-t-slate-900 rounded-full animate-spin"></div>
+            <p class="mt-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Syncing Calendar</p>
+        </div>
+
+        <div id="booking-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            </div>
+
+        <div id="booking-empty" class="hidden flex flex-col items-center justify-center py-32 text-center">
+            <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center mb-6 shadow-sm border border-slate-100">
+                <i class="fa-regular fa-calendar-days text-3xl text-slate-200"></i>
+            </div>
+            <h3 class="text-slate-800 font-black text-base">No bookings found</h3>
+            <p class="text-slate-400 text-xs">When you get a new booking, it will appear here.</p>
+        </div>
+    </div>
+
+</div>
+
+<div id="modal-approve" class="fixed inset-0 z-[100] hidden flex items-center justify-center px-4">
+    <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity" onclick="window.closeModals()"></div>
+    <div class="bg-white w-full max-w-sm rounded-[2rem] p-8 shadow-2xl relative animate-slideUp border border-slate-100">
+        <div class="text-center mb-6">
+            <div class="w-16 h-16 bg-green-50 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                <i class="fa-solid fa-check-circle"></i>
+            </div>
+            <h3 class="text-xl font-black text-slate-900">Accept Request</h3>
+            <p class="text-xs text-slate-500 mt-1">Review the details before confirming.</p>
+        </div>
+        
+        <div id="approve-content" class="bg-slate-50 rounded-2xl p-4 mb-6"></div>
+        
+        <div class="grid grid-cols-2 gap-3">
+            <button onclick="window.closeModals()" class="py-3.5 rounded-xl font-bold text-xs text-slate-500 hover:bg-slate-50 transition">Cancel</button>
+            <button id="btn-approve-action" class="py-3.5 bg-slate-900 text-white rounded-xl font-bold text-xs shadow-lg hover:bg-slate-800 transition">
+                Confirm
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="modal-reschedule" class="fixed inset-0 z-[100] hidden flex items-center justify-center px-4">
+    <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity" onclick="window.closeModals()"></div>
+    <div class="bg-white w-full max-w-sm rounded-[2rem] p-8 shadow-2xl relative animate-slideUp border border-slate-100">
+        
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-black text-slate-900">Reschedule</h3>
+            <button onclick="window.closeModals()" class="w-8 h-8 rounded-full bg-slate-50 text-slate-400 hover:text-slate-900 flex items-center justify-center transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="space-y-4">
+            <div>
+                <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1.5 ml-1">New Date</label>
+                <input type="date" id="res-date" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold text-slate-700 outline-none focus:bg-white focus:border-blue-500 transition">
+            </div>
+            <div>
+                <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1.5 ml-1">New Time</label>
+                <input type="time" id="res-time" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold text-slate-700 outline-none focus:bg-white focus:border-blue-500 transition">
+            </div>
+        </div>
+
+        <button onclick="window.confirmReschedule()" class="w-full mt-8 py-4 bg-blue-600 text-white rounded-2xl font-bold text-xs shadow-xl hover:bg-blue-700 transition active:scale-95">
+            Update Schedule <i class="fa-solid fa-paper-plane ml-2"></i>
+        </button>
+    </div>
+</div>

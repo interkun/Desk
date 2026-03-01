@@ -1,0 +1,229 @@
+<div class="w-full max-w-7xl mx-auto space-y-4 animate-fade-in pb-24 relative">
+
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden mt-2">
+        <div class="p-4 flex flex-row justify-between items-center">
+            <div>
+                <h2 class="text-lg font-black text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-chart-pie text-emerald-600"></i> Finance
+                </h2>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Profit & Loss Tracker</p>
+            </div>
+            
+            <div class="flex items-center gap-2">
+                <span id="current-rate-display" class="hidden md:inline-flex items-center gap-1.5 px-3 py-2 bg-blue-50 text-blue-600 rounded-2xl border border-blue-100 text-[10px] font-black uppercase tracking-wider">
+                    <i class="fa-solid fa-circle-nodes text-[8px] animate-pulse"></i> Syncing Rates
+                </span>
+                
+                <button onclick="window.openRecurringModal()" class="w-10 h-10 rounded-2xl bg-purple-50 text-purple-600 hover:bg-purple-100 flex items-center justify-center transition shadow-sm active:scale-95" title="Recurring">
+                    <i class="fas fa-sync-alt text-xs"></i>
+                </button>
+                
+                <button onclick="window.openFinanceModal()" class="bg-slate-900 text-white px-5 py-2.5 rounded-2xl shadow-sm hover:bg-black active:scale-95 transition flex items-center gap-2">
+                    <i class="fas fa-plus text-xs"></i> 
+                    <span class="text-xs font-bold uppercase tracking-widest hidden md:inline">Transaction</span>
+                    <span class="text-xs font-bold md:hidden">Add</span>
+                </button>
+            </div>
+        </div>
+        <div class="bg-black p-2.5 flex items-center gap-2">
+            <span class="text-slate-400 text-[11px] font-bold uppercase tracking-wider italic ml-2">Financial Insights Active</span>
+        </div>
+    </div>
+
+    <div class="bg-gradient-to-r from-blue-600 to-blue-800 rounded-[2rem] p-6 shadow-xl text-white relative overflow-hidden group mb-4">
+        <div class="relative z-10 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+            <div>
+                <p class="text-blue-200 text-[10px] font-black uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-building-columns"></i> Total Bank Balance
+                </p>
+                <h3 id="display-bank-balance" class="text-4xl md:text-5xl font-black tracking-tight">₹0.00</h3>
+                <p class="text-[10px] text-blue-200 mt-2 font-bold uppercase tracking-wider">
+                    All Payouts & External Incomes
+                </p>
+            </div>
+            <div class="text-right hidden md:block">
+                <div class="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center backdrop-blur-md border border-white/20">
+                    <i class="fa-solid fa-vault text-2xl text-blue-100"></i>
+                </div>
+            </div>
+        </div>
+        <i class="fa-solid fa-rupee-sign absolute -right-4 -bottom-10 text-[150px] text-white/5 rotate-12 transition-transform duration-500 group-hover:scale-110"></i>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="md:col-span-1 bg-slate-900 p-6 rounded-[2rem] shadow-xl text-white relative overflow-hidden group">
+            <div class="relative z-10">
+                <p class="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mb-2">Net Profit</p>
+                <h3 id="display-profit" class="text-4xl font-black mb-6 tracking-tight">₹0.00</h3>
+                <div id="profit-badge" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/10 backdrop-blur-md text-[10px] font-black uppercase tracking-widest text-slate-300 border border-white/10">
+                    <i class="fas fa-chart-line text-emerald-400"></i> Analysing...
+                </div>
+            </div>
+            <i class="fa-solid fa-wallet absolute -right-6 -bottom-6 text-[120px] text-white/5 rotate-12 transition-transform group-hover:scale-110"></i>
+        </div>
+
+        <div class="md:col-span-2 grid grid-cols-2 gap-4">
+            <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm relative overflow-hidden group">
+                <p class="text-slate-400 text-[9px] font-black uppercase tracking-widest mb-1">Total Income</p>
+                <h3 id="display-income" class="text-2xl font-black text-slate-900 tracking-tight">₹0</h3>
+                <div class="absolute top-4 right-4 w-8 h-8 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 transition-transform group-hover:rotate-12">
+                    <i class="fa-solid fa-arrow-down text-xs"></i>
+                </div>
+            </div>
+            
+            <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm relative overflow-hidden group">
+                <p class="text-slate-400 text-[9px] font-black uppercase tracking-widest mb-1">Total Expense</p>
+                <h3 id="display-expense" class="text-2xl font-black text-slate-900 tracking-tight">₹0</h3>
+                <div class="absolute top-4 right-4 w-8 h-8 bg-red-50 rounded-xl flex items-center justify-center text-red-600 transition-transform group-hover:-rotate-12">
+                    <i class="fa-solid fa-arrow-up text-xs"></i>
+                </div>
+            </div>
+
+            <div class="col-span-2 bg-white p-5 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-center">
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Monthly Budget Limit</span>
+                    <button onclick="window.openBudgetModal()" class="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline decoration-2 underline-offset-4">Adjust Limit</button>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-3 mb-2 overflow-hidden border border-slate-50">
+                    <div id="budget-bar" class="h-full bg-emerald-500 w-0 transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(16,185,129,0.3)]"></div>
+                </div>
+                <p id="budget-text" class="text-[9px] font-black text-slate-500 tracking-widest text-right uppercase">0% Budget Exhausted</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+            <h4 class="text-[10px] font-black text-slate-400 mb-6 uppercase tracking-widest flex justify-between items-center">
+                <span>Expense Breakdown</span> 
+                <i class="fas fa-chart-pie text-slate-300"></i>
+            </h4>
+            <div class="h-52 relative">
+                <canvas id="expenseChart"></canvas>
+            </div>
+        </div>
+        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+            <h4 class="text-[10px] font-black text-slate-400 mb-6 uppercase tracking-widest flex justify-between items-center">
+                <span>Cash Flow Analysis</span> 
+                <i class="fas fa-chart-line text-slate-300"></i>
+            </h4>
+            <div class="h-52 relative">
+                <canvas id="cashFlowChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm flex flex-col min-h-[500px] overflow-hidden">
+        <div class="p-4 border-b border-slate-100 flex flex-col md:flex-row gap-4 justify-between items-center bg-slate-50/30">
+            <div class="relative w-full md:w-72">
+                <i class="fas fa-search absolute left-4 top-3.5 text-slate-400 text-xs"></i>
+                <input type="text" onkeyup="window.handleSearch(event)" placeholder="SEARCH TRANSACTIONS..." 
+                    class="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-2xl text-[11px] font-black uppercase tracking-wider outline-none focus:border-blue-500 transition shadow-sm placeholder:text-slate-300">
+            </div>
+            
+            <div class="flex gap-2 w-full md:w-auto">
+                <select id="timeFilter" onchange="window.applyTimeFilter()" class="bg-white border border-slate-200 text-slate-600 text-[10px] font-black uppercase tracking-widest px-4 py-3 rounded-2xl outline-none focus:border-blue-500 cursor-pointer flex-1 md:flex-none shadow-sm">
+                    <option value="this_month">This Month</option>
+                    <option value="last_month">Last Month</option>
+                    <option value="year">Full Year</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="flex-1 overflow-y-auto p-4 custom-scrollbar space-y-3" id="transaction-list">
+            </div>
+    </div>
+
+</div>
+
+<div id="financeModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center px-4">
+    <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="window.closeFinanceModal()"></div>
+    
+    <div class="bg-white w-full max-w-md rounded-[2.5rem] p-8 shadow-2xl relative animate-slideUp max-h-[90vh] overflow-y-auto border border-slate-100">
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h3 class="text-xl font-black text-slate-900" id="modalTitle">New Entry</h3>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Update your ledger</p>
+            </div>
+            <button onclick="window.closeFinanceModal()" class="w-10 h-10 rounded-2xl bg-slate-50 text-slate-500 hover:bg-slate-100 flex items-center justify-center transition">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <form id="financeForm" onsubmit="window.handleAddTransaction(event)" class="space-y-6">
+            <input type="hidden" id="editingTxId">
+            
+            <div class="grid grid-cols-2 gap-3 p-1.5 bg-slate-50 border border-slate-100 rounded-2xl">
+                <label class="cursor-pointer">
+                    <input type="radio" name="type" value="income" class="peer sr-only" checked>
+                    <div class="py-3 text-center rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 peer-checked:bg-white peer-checked:text-emerald-600 peer-checked:shadow-sm transition-all">Income</div>
+                </label>
+                <label class="cursor-pointer">
+                    <input type="radio" name="type" value="expense" class="peer sr-only">
+                    <div class="py-3 text-center rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 peer-checked:bg-white peer-checked:text-red-500 peer-checked:shadow-sm transition-all">Expense</div>
+                </label>
+            </div>
+
+            <div class="flex gap-3">
+                <div class="relative flex-1">
+                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1 tracking-widest">Amount</label>
+                    <input type="number" id="finAmount" required placeholder="0.00" step="0.01" 
+                        class="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl font-black text-xl text-slate-800 outline-none focus:ring-2 focus:ring-slate-900 transition-all">
+                </div>
+                <div class="w-28">
+                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1 tracking-widest">Currency</label>
+                    <select id="finCurrency" class="w-full px-4 py-4.5 bg-slate-50 border border-slate-200 rounded-2xl font-black text-xs text-slate-600 outline-none appearance-none">
+                        <option value="INR">₹ INR</option>
+                        <option value="USD">$ USD</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1 tracking-widest">Category</label>
+                    <select id="finCategory" class="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-[11px] font-black text-slate-700 outline-none appearance-none">
+                        <option value="brand_deal">Brand Deal</option>
+                        <option value="adsense">AdSense</option>
+                        <option value="service">Service</option>
+                        <option value="software">Software</option>
+                        <option value="equipment">Equipment</option>
+                        <option value="marketing">Marketing</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1 tracking-widest">Date</label>
+                    <input type="date" id="finDate" required class="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-[11px] font-black text-slate-700 outline-none focus:ring-2 focus:ring-slate-900">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1 tracking-widest">Description</label>
+                <input type="text" id="finDesc" placeholder="E.G. CLIENT PAYMENT" 
+                    class="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl font-black text-xs text-slate-800 outline-none focus:ring-2 focus:ring-slate-900 transition-all uppercase placeholder:text-slate-200">
+            </div>
+
+            <button type="submit" id="btn-save-tx" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl hover:bg-black transition transform active:scale-95">
+                Save Transaction
+            </button>
+        </form>
+    </div>
+</div>
+
+<div id="budgetModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center px-4">
+    <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="window.closeBudgetModal()"></div>
+    <div class="bg-white w-full max-w-sm rounded-[2.5rem] p-8 shadow-2xl relative animate-slideUp border border-slate-100 text-center">
+        <div class="w-16 h-16 bg-slate-50 rounded-[2rem] flex items-center justify-center mb-4 mx-auto">
+            <i class="fa-solid fa-bullseye text-2xl text-slate-300"></i>
+        </div>
+        <h3 class="text-xl font-black text-slate-900 mb-2">Monthly Budget</h3>
+        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6">Set your maximum spending limit</p>
+        
+        <div class="relative mb-6">
+            <span class="absolute left-5 top-4.5 font-black text-slate-300">₹</span>
+            <input type="number" id="monthlyBudgetInput" class="w-full pl-10 pr-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl font-black text-xl outline-none focus:ring-2 focus:ring-slate-900 tracking-tight" placeholder="0.00">
+        </div>
+        
+        <button onclick="window.saveBudgetSettings()" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg hover:bg-black transition active:scale-95">Set Budget</button>
+    </div>
+</div>

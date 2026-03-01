@@ -1,0 +1,95 @@
+<div class="w-full max-w-7xl mx-auto space-y-6 animate-fade-in pb-24">
+
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white/80 backdrop-blur-md p-6 rounded-3xl border border-slate-200 shadow-sm">
+        <div>
+            <h1 class="text-xl md:text-2xl font-black text-slate-800 mb-1">Priority DMs 💬</h1>
+            <div class="flex items-center gap-2">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                    <span id="stat-total-msgs">0</span> Total Queries
+                </p>
+                <button onclick="window.loadMessagesPage()" class="text-slate-400 hover:text-orange-600 transition text-xs">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="relative w-full md:w-72">
+            <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-slate-400 text-xs"></i>
+            <input type="text" onkeyup="window.MessagesAdmin.handleSearch(event)" placeholder="Search client or query..." 
+                class="w-full pl-10 pr-4 py-3 rounded-2xl bg-white border border-slate-200 outline-none text-xs font-bold focus:ring-4 focus:ring-slate-100/50 transition shadow-sm">
+        </div>
+    </div>
+
+    <div class="flex items-center justify-between px-2 overflow-x-auto no-scrollbar">
+        <div class="flex bg-white p-1.5 rounded-2xl border border-slate-200 shadow-sm gap-1 min-w-max">
+            <button onclick="window.MessagesAdmin.switchTab('pending')" id="tab-pending" 
+                class="filter-tab px-5 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 bg-slate-900 text-white shadow-md">
+                Needs Reply <span id="badge-pending-msgs" class="ml-1 bg-orange-500 text-white px-1.5 rounded-full text-[9px] hidden">0</span>
+            </button>
+            
+            <button onclick="window.MessagesAdmin.switchTab('completed')" id="tab-completed" 
+                class="filter-tab px-5 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 text-slate-500 hover:bg-slate-50">
+                Answered
+            </button>
+        </div>
+    </div>
+
+    <div class="px-1">
+        <div id="messages-loader" class="hidden flex flex-col items-center justify-center py-24">
+            <div class="w-10 h-10 border-4 border-slate-100 border-t-slate-900 rounded-full animate-spin"></div>
+            <p class="mt-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Syncing Messages</p>
+        </div>
+
+        <div id="messages-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            </div>
+
+        <div id="messages-empty" class="hidden flex flex-col items-center justify-center py-32 text-center">
+            <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center mb-6 shadow-sm border border-slate-100">
+                <i class="fa-regular fa-comments text-3xl text-slate-200"></i>
+            </div>
+            <h3 class="text-slate-800 font-black text-base">No messages found</h3>
+            <p class="text-slate-400 text-xs">You are all caught up!</p>
+        </div>
+    </div>
+
+</div>
+
+<div id="admin-reply-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center px-4">
+    <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="window.MessagesAdmin.closeModal()"></div>
+    <div class="bg-white w-full max-w-lg rounded-[2.5rem] overflow-hidden shadow-2xl relative animate-fade-in-up border border-white/20">
+        
+        <div class="bg-slate-50 px-6 py-5 border-b border-slate-100 flex justify-between items-center">
+            <div>
+                <h3 class="text-slate-900 font-black text-sm">Reply to User</h3>
+                <p id="modal-reply-id" class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Booking ID</p>
+            </div>
+            <button onclick="window.MessagesAdmin.closeModal()" class="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-600 transition shadow-sm">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="p-6 space-y-5">
+            <div class="bg-slate-900 text-white p-5 rounded-2xl rounded-tl-none shadow-md">
+                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-2 border-b border-slate-700 pb-1">User's Question</p>
+                <p id="modal-user-query" class="text-sm font-medium leading-relaxed"></p>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Your Expert Reply</label>
+                <textarea id="admin-reply-text" placeholder="Write your detailed response here..." 
+                    class="w-full h-40 bg-slate-50 border border-slate-200 rounded-2xl p-4 text-sm font-medium outline-none focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 transition-all resize-none"></textarea>
+            </div>
+        </div>
+
+        <div class="p-5 bg-slate-50 border-t border-slate-100 flex gap-3">
+            <button onclick="window.MessagesAdmin.closeModal()" class="w-1/3 py-4 bg-white border border-slate-200 text-slate-500 rounded-2xl text-xs font-bold uppercase tracking-widest shadow-sm hover:bg-slate-50 transition-all">
+                Cancel
+            </button>
+            <button onclick="window.MessagesAdmin.sendReply()" id="btn-send-reply" 
+                class="flex-1 py-4 bg-slate-900 text-white rounded-2xl text-xs font-bold uppercase tracking-widest shadow-xl hover:bg-slate-800 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                <span>Send Reply</span> <i class="fa-solid fa-paper-plane text-[10px]"></i>
+            </button>
+        </div>
+        <input type="hidden" id="hidden-booking-id">
+    </div>
+</div>

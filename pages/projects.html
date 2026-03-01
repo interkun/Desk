@@ -1,0 +1,182 @@
+<div class="w-full max-w-7xl mx-auto space-y-4 animate-fade-in pb-24 relative">
+
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden mt-2">
+        <div class="p-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="w-full md:w-auto flex justify-between items-center">
+                <div>
+                    <h2 class="text-lg font-black text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-layer-group text-blue-600"></i> Projects
+                    </h2>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Content Pipeline</p>
+                </div>
+                <button onclick="window.openProjectModal()" class="md:hidden bg-slate-900 text-white w-10 h-10 rounded-2xl shadow-lg hover:bg-black active:scale-95 transition flex items-center justify-center">
+                    <i class="fas fa-plus text-sm"></i>
+                </button>
+            </div>
+            
+            <div class="flex items-center gap-3 w-full md:w-auto">
+                <div class="relative flex-1 md:w-64">
+                    <i class="fas fa-search absolute left-4 top-3.5 text-slate-400 text-xs"></i>
+                    <input type="text" onkeyup="window.handleSearch(event)" placeholder="SEARCH PROJECTS..." 
+                        class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl text-[11px] font-black uppercase tracking-wider outline-none focus:border-blue-500 transition text-slate-700">
+                </div>
+
+                <button onclick="window.openProjectModal()" class="hidden md:flex bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-sm hover:bg-black active:scale-95 transition items-center gap-2">
+                    <i class="fas fa-plus text-xs"></i> 
+                    <span class="text-xs font-bold uppercase tracking-widest">New Project</span>
+                </button>
+            </div>
+        </div>
+        <div class="bg-black p-2.5 flex items-center gap-2">
+            <span class="text-slate-400 text-[11px] font-bold uppercase tracking-wider italic ml-2">Active Workspace</span>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <button onclick="window.setProjectFilter('All')" id="filter-All" class="filter-btn active bg-white p-4 rounded-3xl border border-slate-200 shadow-sm text-left hover:border-blue-300 transition-all active:scale-95">
+            <span class="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Total</span>
+            <span class="text-2xl font-black text-slate-800" id="count-all">0</span>
+        </button>
+        <button onclick="window.setProjectFilter('In Progress')" id="filter-Progress" class="filter-btn bg-white p-4 rounded-3xl border border-slate-200 shadow-sm text-left hover:border-blue-300 transition-all active:scale-95">
+            <span class="block text-[9px] font-black text-blue-500 uppercase tracking-widest mb-1">In Progress</span>
+            <span class="text-2xl font-black text-slate-800" id="count-active">0</span>
+        </button>
+        <button onclick="window.setProjectFilter('Editing')" id="filter-Editing" class="filter-btn bg-white p-4 rounded-3xl border border-slate-200 shadow-sm text-left hover:border-orange-300 transition-all active:scale-95">
+            <span class="block text-[9px] font-black text-orange-500 uppercase tracking-widest mb-1">Editing</span>
+            <span class="text-2xl font-black text-slate-800" id="count-review">0</span>
+        </button>
+        <button onclick="window.setProjectFilter('Published')" id="filter-Published" class="filter-btn bg-white p-4 rounded-3xl border border-slate-200 shadow-sm text-left hover:border-emerald-300 transition-all active:scale-95">
+            <span class="block text-[9px] font-black text-emerald-500 uppercase tracking-widest mb-1">Published</span>
+            <span class="text-2xl font-black text-slate-800" id="count-done">0</span>
+        </button>
+    </div>
+
+    <div class="relative min-h-[400px]">
+        <div id="projects-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            </div>
+        
+        <div class="text-center mt-8 hidden" id="load-more-container">
+            <button onclick="window.loadMoreProjects()" class="text-[10px] font-black uppercase tracking-widest text-slate-500 bg-white border border-slate-200 px-8 py-3 rounded-2xl hover:bg-slate-50 transition shadow-sm active:scale-95">
+                Load More Projects
+            </button>
+        </div>
+        
+        <div id="empty-state" class="hidden flex-col items-center justify-center py-32 text-slate-300">
+            <div class="w-16 h-16 bg-slate-50 rounded-[2rem] flex items-center justify-center mb-4">
+                <i class="fas fa-rocket text-2xl opacity-30"></i>
+            </div>
+            <p class="text-[10px] font-black uppercase tracking-widest">No projects found</p>
+        </div>
+    </div>
+</div>
+
+<div id="projectModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center px-4">
+    <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="window.closeProjectModal()"></div>
+    
+    <div class="bg-white w-full max-w-lg rounded-[2.5rem] p-8 shadow-2xl relative animate-slideUp max-h-[90vh] overflow-y-auto border border-slate-100">
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h3 class="text-xl font-black text-slate-900" id="projectModalTitle">Start Project</h3>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Setup your next big idea</p>
+            </div>
+            <button onclick="window.closeProjectModal()" class="w-10 h-10 rounded-2xl bg-slate-50 text-slate-500 hover:bg-slate-100 flex items-center justify-center transition">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <form id="projectForm" onsubmit="window.handleSaveProject(event)" class="space-y-6">
+            <input type="hidden" id="editingProjectId">
+            <input type="hidden" id="selectedTemplate">
+
+            <div class="flex gap-3 overflow-x-auto pb-2 custom-scrollbar" id="template-container">
+                </div>
+
+            <div>
+                <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1 tracking-widest">Project Name</label>
+                <input type="text" id="projectName" required placeholder="E.G. NEW TECH VLOG" 
+                    class="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl font-black text-xs text-slate-800 outline-none focus:ring-2 focus:ring-slate-900 transition-all">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1 tracking-widest">Current Stage</label>
+                    <select id="projectStage" class="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-[11px] font-black text-slate-700 outline-none appearance-none">
+                        <option value="Idea">💡 IDEA PHASE</option>
+                        <option value="Scripting">📝 SCRIPTING</option>
+                        <option value="Filming">🎥 FILMING</option>
+                        <option value="Editing">🎬 EDITING</option>
+                        <option value="Published">✅ PUBLISHED</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1 tracking-widest">Target Date</label>
+                    <input type="date" id="projectDeadline" class="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-[11px] font-black text-slate-700 outline-none focus:ring-2 focus:ring-slate-900">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1 tracking-widest">Notes & Description</label>
+                <textarea id="projectDesc" rows="3" placeholder="WRITE YOUR SCRIPT NOTES HERE..."
+                    class="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl font-bold text-xs text-slate-700 outline-none resize-none focus:ring-2 focus:ring-slate-900"></textarea>
+            </div>
+
+            <div>
+                <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1 tracking-widest">Resource Link</label>
+                <div class="relative">
+                    <i class="fas fa-link absolute left-5 top-4.5 text-slate-400 text-xs"></i>
+                    <input type="url" id="projectLink" placeholder="DRIVE OR FIGMA URL" 
+                        class="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl font-black text-xs text-blue-600 outline-none">
+                </div>
+            </div>
+
+            <button type="submit" id="saveProjectBtn" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl hover:bg-black transition transform active:scale-95">
+                Launch Project
+            </button>
+        </form>
+    </div>
+</div>
+
+<div id="taskModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center px-4">
+    <div class="absolute inset-0 bg-slate-900/70 backdrop-blur-sm" onclick="window.closeTaskModal()"></div>
+    <div class="bg-white w-full max-w-2xl h-[85vh] rounded-[2.5rem] shadow-2xl relative animate-slideUp flex flex-col overflow-hidden border border-slate-100">
+        
+        <div class="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-white z-10">
+            <div>
+                <h3 class="text-lg font-black text-slate-800 truncate max-w-[200px] md:max-w-md" id="taskModalTitle">Project Details</h3>
+                <div class="flex gap-6 mt-3">
+                    <button onclick="window.switchProjectTab('tasks')" id="tab-tasks" class="text-[10px] font-black uppercase tracking-widest text-blue-600 border-b-2 border-blue-600 pb-1">Tasks</button>
+                    <button onclick="window.switchProjectTab('chat')" id="tab-chat" class="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-600 pb-1">Discussion</button>
+                </div>
+            </div>
+            <button onclick="window.closeTaskModal()" class="w-10 h-10 rounded-2xl bg-slate-50 text-slate-500 hover:bg-slate-100 flex items-center justify-center transition"><i class="fas fa-times"></i></button>
+        </div>
+        
+        <input type="hidden" id="currentProjectId">
+
+        <div class="flex-1 relative bg-slate-50/50 overflow-hidden">
+            <div id="view-tasks" class="absolute inset-0 flex flex-col p-6">
+                <form onsubmit="window.handleAddTask(event)" class="relative mb-6">
+                    <input type="text" id="taskName" placeholder="ADD A NEW TASK..." autocomplete="off"
+                        class="w-full pl-5 pr-14 py-4 bg-white border border-slate-200 rounded-2xl text-[11px] font-black uppercase tracking-widest outline-none focus:border-blue-500 shadow-sm">
+                    <button type="submit" class="absolute right-2 top-2 bottom-2 bg-slate-900 text-white px-4 rounded-xl text-xs hover:bg-black transition">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </form>
+                <div class="flex-1 overflow-y-auto space-y-3 custom-scrollbar" id="taskList"></div>
+            </div>
+
+            <div id="view-chat" class="absolute inset-0 flex flex-col hidden bg-white">
+                <div id="chatList" class="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar bg-slate-50/50"></div>
+                <div class="p-6 bg-white border-t border-slate-100">
+                    <form onsubmit="window.handleSendChat(event)" class="flex gap-3">
+                        <input type="text" id="chatInput" placeholder="TYPE MESSAGE..." autocomplete="off" 
+                            class="flex-1 px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-[11px] font-black tracking-widest outline-none focus:ring-2 focus:ring-slate-900">
+                        <button type="submit" class="bg-blue-600 text-white w-14 rounded-2xl hover:bg-blue-700 transition shadow-lg active:scale-95">
+                            <i class="fas fa-paper-plane text-xs"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
