@@ -1,27 +1,36 @@
 import { db, auth } from "../firebase.js";
-import { collection, query, where, getDocs, doc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { 
+    collection, query, where, orderBy, getDocs, doc, updateDoc, serverTimestamp, addDoc 
+} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 import { requireAuth } from "../services/auth-guard.js";
 
 let state = {
     user: null,
     allMessages: [],
     currentTab: 'pending',
-    searchTerm: '' // Search ke liye naya state
+    searchTerm: ''
 };
 
 export async function init() {
     state.user = await requireAuth();
     await loadMessages();
 }
-
 window.loadMessagesPage = init; 
 
+// ✅ FIX: Sirf apne DM fetch karo — sellerId filter add kiya
+// Pehle sirf type == "dm" tha, sab creators ke DM aa rahe the
 async function loadMessages() {
     const loader = document.getElementById('messages-loader');
     if (loader) loader.classList.remove('hidden');
 
     try {
-        const q = query(collection(db, "bookings"), where("type", "==", "dm"));
+        const q = query(
+            collection(db, "bookings"),
+            where("type", "==", "dm"),                      // Sirf DM type
+            where("sellerId", "==", state.user.uid),        // ✅ Sirf apne DM
+            orderBy("createdAt", "desc")
+        );
+
         const snap = await getDocs(q);
 
         state.allMessages = snap.docs.map(doc => {
@@ -34,7 +43,6 @@ async function loadMessages() {
         }).sort((a, b) => b.sortDate - a.sortDate);
 
         refreshDisplay();
-
     } catch (error) {
         console.error("Error loading messages:", error);
     } finally {
@@ -45,18 +53,14 @@ async function loadMessages() {
 function switchTab(tab) {
     state.currentTab = tab;
     
-    // Booking jaise exact tab classes
     ['pending', 'completed'].forEach(s => {
         const btn = document.getElementById(`tab-${s}`);
         if (btn) {
-            if (s === tab) {
-                btn.className = "filter-tab px-5 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 bg-slate-900 text-white shadow-md";
-            } else {
-                btn.className = "filter-tab px-5 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 text-slate-500 hover:bg-slate-50";
-            }
+            btn.className = s === tab
+                ? "filter-tab px-5 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 bg-slate-900 text-white shadow-md"
+                : "filter-tab px-5 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 text-slate-500 hover:bg-slate-50";
         }
     });
-
     refreshDisplay();
 }
 
@@ -82,12 +86,12 @@ function refreshDisplay() {
     const totalEl = document.getElementById('stat-total-msgs');
     if(totalEl) totalEl.innerText = state.allMessages.length;
 
-    // 2. Filter Tab Logic
+    // 2. Tab Filter
     let filtered = state.allMessages.filter(item => {
         return state.currentTab === 'pending' ? item.status === 'pending' : item.status === 'completed';
     });
 
-    // 3. Search Bar Filter Logic
+    // 3. Search Filter
     if(state.searchTerm) {
         const term = state.searchTerm.toLowerCase();
         filtered = filtered.filter(b => 
@@ -103,21 +107,32 @@ function refreshDisplay() {
     }
     if(empty) empty.classList.add('hidden');
 
-    // 4. Render Compact Cards (Like Booking)
+    // 4. Render Cards
     filtered.forEach(item => {
-        const dateStr = item.messageSentAt ? new Date(item.messageSentAt.seconds * 1000).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : 'Waiting for user';
+        const dateStr = item.messageSentAt 
+            ? new Date(item.messageSentAt.seconds * 1000).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) 
+            : 'Waiting for user';
+
         const hasUserQueried = item.userQuery && item.userQuery.length > 0;
         
         let actionBtn = '';
         if (state.currentTab === 'pending') {
             if (hasUserQueried) {
                 const safeQuery = item.userQuery.replace(/'/g, "&apos;").replace(/"/g, "&quot;");
-                actionBtn = `<button onclick="window.MessagesAdmin.openModal('${item.id}', '${safeQuery}')" class="w-full mt-3 py-2 bg-slate-900 text-white rounded-xl text-[10px] font-bold shadow-md hover:bg-slate-800 transition">Write Reply</button>`;
+                actionBtn = `<button onclick="window.MessagesAdmin.openModal('${item.id}', '${safeQuery}')" 
+                    class="w-full mt-3 py-2 bg-slate-900 text-white rounded-xl text-[10px] font-bold shadow-md hover:bg-slate-800 transition">
+                    Write Reply
+                </button>`;
             } else {
-                actionBtn = `<button disabled class="w-full mt-3 py-2 bg-slate-50 border border-slate-100 text-slate-400 rounded-xl text-[10px] font-bold cursor-not-allowed">Waiting for user</button>`;
+                actionBtn = `<button disabled 
+                    class="w-full mt-3 py-2 bg-slate-50 border border-slate-100 text-slate-400 rounded-xl text-[10px] font-bold cursor-not-allowed">
+                    Waiting for user
+                </button>`;
             }
         } else {
-            actionBtn = `<div class="mt-3 pt-3 border-t border-slate-100 text-[10px] font-medium text-slate-600 line-clamp-2"><span class="font-bold text-emerald-600">Reply:</span> ${item.sellerReply || ''}</div>`;
+            actionBtn = `<div class="mt-3 pt-3 border-t border-slate-100 text-[10px] font-medium text-slate-600 line-clamp-2">
+                <span class="font-bold text-emerald-600">Reply:</span> ${item.sellerReply || ''}
+            </div>`;
         }
 
         const badgeToUse = state.currentTab === 'completed' 
@@ -144,7 +159,6 @@ function refreshDisplay() {
                         </div>
                         ${badgeToUse}
                     </div>
-
                     <div class="bg-slate-50 rounded-xl p-3 border border-slate-100">
                         <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Client: ${item.userName || 'Guest User'}</p>
                         <p class="text-sm font-bold text-slate-800 truncate mb-1">${item.title}</p>
@@ -167,7 +181,6 @@ function openModal(id, userQuery) {
     document.getElementById('modal-reply-id').innerText = `ID: ${id.substring(0, 8).toUpperCase()}`;
     document.getElementById('modal-user-query').innerText = userQuery;
     document.getElementById('admin-reply-text').value = '';
-    
     document.getElementById('admin-reply-modal').classList.remove('hidden');
 }
 
@@ -175,6 +188,7 @@ function closeModal() {
     document.getElementById('admin-reply-modal').classList.add('hidden');
 }
 
+// ✅ FIX: Reply ke baad user ko notification bhi bhejo
 async function sendReply() {
     const id = document.getElementById('hidden-booking-id').value;
     const replyText = document.getElementById('admin-reply-text').value.trim();
@@ -186,13 +200,28 @@ async function sendReply() {
     btn.disabled = true;
 
     try {
+        // ✅ Sirf DM wali fields update karo (rules ke hisaab se)
         await updateDoc(doc(db, "bookings", id), {
             sellerReply: replyText,
             repliedAt: serverTimestamp(),
-            status: 'completed'
+            status: 'completed',
+            updatedAt: serverTimestamp()
         });
 
-        alert("Reply sent successfully!");
+        // ✅ User ko notification bhejo
+        const bookingData = state.allMessages.find(m => m.id === id);
+        if (bookingData?.userId) {
+            await addDoc(collection(db, "notifications"), {
+                userId: bookingData.userId,
+                title: "Creator ne reply diya! 💬",
+                message: `${state.user.displayName || 'Creator'} ne aapke DM question ka jawab de diya. Library mein check karein.`,
+                type: "sale",
+                read: false,
+                link: "#library",
+                createdAt: serverTimestamp()
+            });
+        }
+
         closeModal();
         await loadMessages(); 
     } catch (e) {
