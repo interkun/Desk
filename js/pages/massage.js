@@ -17,32 +17,38 @@ export async function init() {
 }
 window.loadMessagesPage = init; 
 
-// ✅ FIX: Sirf apne DM fetch karo — sellerId filter add kiya
-// Pehle sirf type == "dm" tha, sab creators ke DM aa rahe the
+// ✅ FIX: Firebase Index aur Permission Denied Error Bypass
 async function loadMessages() {
     const loader = document.getElementById('messages-loader');
     if (loader) loader.classList.remove('hidden');
 
     try {
+        // Sirf sellerId se data mangwayenge (Rules ke hisaab se yeh 100% allow hai)
         const q = query(
             collection(db, "bookings"),
-            where("type", "==", "dm"),                      // Sirf DM type
-            where("sellerId", "==", state.user.uid),        // ✅ Sirf apne DM
+            where("sellerId", "==", state.user.uid),
             orderBy("createdAt", "desc")
         );
 
         const snap = await getDocs(q);
 
-        state.allMessages = snap.docs.map(doc => {
-            const data = doc.data();
-            return {
-                id: doc.id,
-                ...data,
-                sortDate: data.messageSentAt?.seconds || data.purchasedAt?.seconds || 0
-            };
-        }).sort((a, b) => b.sortDate - a.sortDate);
+        // Saare documents nikal lo
+        const allData = snap.docs.map(doc => {
+            return { id: doc.id, ...doc.data() };
+        });
+
+        // ✅ JS mein sirf "dm" filter kar lo (Index banane ki zaroorat hi nahi padegi)
+        state.allMessages = allData
+            .filter(b => b.type === "dm")
+            .map(item => {
+                return {
+                    ...item,
+                    sortDate: item.messageSentAt?.seconds || item.purchasedAt?.seconds || 0
+                };
+            }).sort((a, b) => b.sortDate - a.sortDate);
 
         refreshDisplay();
+
     } catch (error) {
         console.error("Error loading messages:", error);
     } finally {
@@ -200,7 +206,6 @@ async function sendReply() {
     btn.disabled = true;
 
     try {
-        // ✅ Sirf DM wali fields update karo (rules ke hisaab se)
         await updateDoc(doc(db, "bookings", id), {
             sellerReply: replyText,
             repliedAt: serverTimestamp(),
@@ -208,7 +213,6 @@ async function sendReply() {
             updatedAt: serverTimestamp()
         });
 
-        // ✅ User ko notification bhejo
         const bookingData = state.allMessages.find(m => m.id === id);
         if (bookingData?.userId) {
             await addDoc(collection(db, "notifications"), {
