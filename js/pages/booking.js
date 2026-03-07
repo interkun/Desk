@@ -48,16 +48,20 @@ function setupRealtimeListener() {
 }
 
 // --- CORE RENDER LOGIC ---
+// --- CORE RENDER LOGIC ---
 function updateUI() {
-    const pendingCount = state.bookings.filter(b => b.status === 'pending').length;
+    // NAYA: Sirf calls aur webinars ko filter out karein, DMs ko hata dein
+    const nonDmBookings = state.bookings.filter(b => b.type !== 'dm');
+
+    const pendingCount = nonDmBookings.filter(b => b.status === 'pending').length;
     const badge = document.getElementById('badge-pending');
     if(badge) {
         badge.innerText = pendingCount;
         badge.classList.toggle('hidden', pendingCount === 0);
     }
-    document.getElementById('stat-total').innerText = state.bookings.length;
+    document.getElementById('stat-total').innerText = nonDmBookings.length;
 
-    let filtered = state.bookings.filter(b => b.status === state.filter);
+    let filtered = nonDmBookings.filter(b => b.status === state.filter);
     
     if(state.searchTerm) {
         const term = state.searchTerm.toLowerCase();
@@ -357,4 +361,5 @@ window.openApprove = (id, type, userId) => {
 
 window.markCompleted = async (id) => updateDoc(doc(db, "bookings", id), { status: 'completed' });
 window.deleteBooking = async (id) => { if(confirm("Delete record?")) updateDoc(doc(db, "bookings", id), { status: 'cancelled' }); };
+
 window.closeModals = () => document.querySelectorAll('[id^="modal-"]').forEach(m => m.classList.add('hidden'));
