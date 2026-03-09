@@ -16,7 +16,7 @@
         <div class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-5 w-full">
             
             <button onclick="window.selectType('call')" class="group bg-white p-4 md:p-6 rounded-2xl border border-slate-200 hover:border-orange-500 hover:shadow-lg transition-all text-left relative overflow-hidden">
-                <div class="w-8 h-8 md:w-12 md:h-12 bg-orange-50 text-orange-600 rounded-lg md:rounded-xl flex items-center justify-center text-sm md:text-xl mb-3 group-hover:scale-110 transition">
+                <div class="w-8 h-8 md:w-12 h-12 bg-orange-50 text-orange-600 rounded-lg md:rounded-xl flex items-center justify-center text-sm md:text-xl mb-3 group-hover:scale-110 transition">
                     <i class="fa-solid fa-video"></i>
                 </div>
                 <h3 class="text-sm md:text-lg font-bold text-slate-800 leading-tight">1:1 Call</h3>
@@ -24,7 +24,7 @@
             </button>
 
             <button onclick="window.selectType('dm')" class="group bg-white p-4 md:p-6 rounded-2xl border border-slate-200 hover:border-pink-500 hover:shadow-lg transition-all text-left">
-                <div class="w-8 h-8 md:w-12 md:h-12 bg-pink-50 text-pink-600 rounded-lg md:rounded-xl flex items-center justify-center text-sm md:text-xl mb-3 group-hover:scale-110 transition">
+                <div class="w-8 h-8 md:w-12 h-12 bg-pink-50 text-pink-600 rounded-lg md:rounded-xl flex items-center justify-center text-sm md:text-xl mb-3 group-hover:scale-110 transition">
                     <i class="fa-solid fa-comment-dots"></i>
                 </div>
                 <h3 class="text-sm md:text-lg font-bold text-slate-800 leading-tight">Priority DM</h3>
@@ -32,7 +32,7 @@
             </button>
 
             <button onclick="window.selectType('digital')" class="group bg-white p-4 md:p-6 rounded-2xl border border-slate-200 hover:border-blue-500 hover:shadow-lg transition-all text-left">
-                <div class="w-8 h-8 md:w-12 md:h-12 bg-blue-50 text-blue-600 rounded-lg md:rounded-xl flex items-center justify-center text-sm md:text-xl mb-3 group-hover:scale-110 transition">
+                <div class="w-8 h-8 md:w-12 h-12 bg-blue-50 text-blue-600 rounded-lg md:rounded-xl flex items-center justify-center text-sm md:text-xl mb-3 group-hover:scale-110 transition">
                     <i class="fa-solid fa-file-zipper"></i>
                 </div>
                 <h3 class="text-sm md:text-lg font-bold text-slate-800 leading-tight">Digital File</h3>
@@ -40,12 +40,21 @@
             </button>
 
             <button onclick="window.selectType('webinar')" class="group bg-white p-4 md:p-6 rounded-2xl border border-slate-200 hover:border-purple-500 hover:shadow-lg transition-all text-left">
-                <div class="w-8 h-8 md:w-12 md:h-12 bg-purple-50 text-purple-600 rounded-lg md:rounded-xl flex items-center justify-center text-sm md:text-xl mb-3 group-hover:scale-110 transition">
+                <div class="w-8 h-8 md:w-12 h-12 bg-purple-50 text-purple-600 rounded-lg md:rounded-xl flex items-center justify-center text-sm md:text-xl mb-3 group-hover:scale-110 transition">
                     <i class="fa-solid fa-users"></i>
                 </div>
                 <h3 class="text-sm md:text-lg font-bold text-slate-800 leading-tight">Webinar</h3>
                 <p class="text-[10px] md:text-xs text-slate-500 mt-1 leading-tight">Group workshop or class.</p>
             </button>
+
+            <button onclick="window.selectType('audiobook')" class="group bg-white p-4 md:p-6 rounded-2xl border border-slate-200 hover:border-teal-500 hover:shadow-lg transition-all text-left">
+                <div class="w-8 h-8 md:w-12 h-12 bg-teal-50 text-teal-600 rounded-lg md:rounded-xl flex items-center justify-center text-sm md:text-xl mb-3 group-hover:scale-110 transition">
+                    <i class="fa-solid fa-headphones"></i>
+                </div>
+                <h3 class="text-sm md:text-lg font-bold text-slate-800 leading-tight">Audio Course</h3>
+                <p class="text-[10px] md:text-xs text-slate-500 mt-1 leading-tight">Sell Podcasts & Audiobooks.</p>
+            </button>
+            
         </div>
     </div>
 
@@ -64,11 +73,24 @@
             <div class="md:col-span-2 space-y-4">
                 
                 <div class="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm">
-                    <div class="space-y-3">
+                    <div class="space-y-4">
                         <div>
                             <label class="block text-[10px] md:text-xs font-bold text-slate-500 uppercase mb-1">Title</label>
-                            <input type="text" id="inp-title" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-800 outline-none focus:border-slate-400 transition" placeholder="e.g. 15 Min Consultation">
+                            <input type="text" id="inp-title" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-800 outline-none focus:border-slate-400 transition" placeholder="e.g. Mastering SEO Audio Course">
                         </div>
+                        
+                        <div>
+                            <label class="block text-[10px] md:text-xs font-bold text-slate-500 uppercase mb-1">Category</label>
+                            <select id="inp-category" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs md:text-sm font-bold text-slate-800 outline-none focus:border-blue-400 transition cursor-pointer appearance-none">
+                                <option value="" disabled selected>Select Category</option>
+                                <option value="Audio & Podcasts">Audio & Podcasts</option>
+                                <option value="E-Books & Media">E-Books & Media</option>
+                                <option value="Software & Apps">Software & Apps</option>
+                                <option value="Online Courses">Online Courses</option>
+                                <option value="Consulting & Coaching">Consulting & Coaching</option>
+                            </select>
+                        </div>
+
                         <div>
                             <label class="block text-[10px] md:text-xs font-bold text-slate-500 uppercase mb-1">Description</label>
                             <textarea id="inp-desc" rows="3" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs md:text-sm font-medium text-slate-700 outline-none focus:border-slate-400 transition" placeholder="Describe your service..."></textarea>
@@ -130,7 +152,7 @@
                     <div class="grid grid-cols-1 gap-3">
                         <div>
                             <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Response Time (Promise)</label>
-                            <select id="inp-response-time" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-800 outline-none">
+                            <select id="inp-response-time" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-800 outline-none focus:border-pink-400">
                                 <option value="24">Within 24 Hours</option>
                                 <option value="48">Within 48 Hours</option>
                             </select>
@@ -141,40 +163,28 @@
 
                 <div id="section-digital" class="hidden bg-white p-4 rounded-2xl border border-slate-200 shadow-sm border-l-4 border-l-blue-500">
                     
-                    <div class="mb-5">
-                        <label class="block text-xs font-bold text-slate-900 uppercase tracking-wide mb-2">Product Category <span class="text-red-500">*</span></label>
-                        <select id="inp-category" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs md:text-sm font-bold text-slate-800 outline-none focus:border-blue-400 transition cursor-pointer appearance-none">
-                            <option value="" disabled selected>Select Category</option>
-                            <option value="Software & Apps">Software & Apps</option>
-                            <option value="E-Books & Media">E-Books & Media</option>
-                            <option value="Online Courses">Online Courses</option>
-                            <option value="Templates & Printables">Templates & Printables</option>
-                            <option value="Graphics & Assets">Graphics & Assets</option>
-                        </select>
+                    <div class="mb-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wide">1. Main File <span class="text-red-500">*</span></h3>
+                            <span id="file-format-hint" class="text-[9px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">PDF, ZIP</span>
+                        </div>
+                        
+                        <div class="relative w-full h-24 bg-blue-50 border-2 border-dashed border-blue-200 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:bg-blue-100 transition group">
+                            <input type="file" id="inp-file" accept=".zip,.rar,.pdf" class="absolute inset-0 opacity-0 cursor-pointer z-10">
+                            
+                            <div id="file-ui-default" class="text-center group-hover:scale-105 transition">
+                                <i class="fa-solid fa-cloud-arrow-up text-xl text-blue-400"></i>
+                                <p class="text-[10px] font-bold text-blue-600 mt-1">Tap to Upload</p>
+                            </div>
+                            
+                            <div id="file-ui-success" class="hidden flex-col items-center">
+                                <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm mb-1">
+                                    <i class="fa-solid fa-check text-green-500"></i>
+                                </div>
+                                <p class="text-[10px] font-bold text-green-700 max-w-[150px] truncate" id="file-name">file.zip</p>
+                            </div>
+                        </div>
                     </div>
-
-                    <div class="mb-4 pt-3 border-t border-slate-100">
-    <div class="flex justify-between items-center mb-2">
-        <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wide">1. Main File <span class="text-red-500">*</span></h3>
-        <span id="file-format-hint" class="text-[9px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">PDF, ZIP</span>
-    </div>
-    
-    <div class="relative w-full h-24 bg-blue-50 border-2 border-dashed border-blue-200 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:bg-blue-100 transition group">
-        <input type="file" id="inp-file" accept=".zip,.rar,.pdf" class="absolute inset-0 opacity-0 cursor-pointer z-10">
-        
-        <div id="file-ui-default" class="text-center group-hover:scale-105 transition">
-            <i class="fa-solid fa-cloud-arrow-up text-xl text-blue-400"></i>
-            <p class="text-[10px] font-bold text-blue-600 mt-1">Tap to Upload</p>
-        </div>
-        
-        <div id="file-ui-success" class="hidden flex-col items-center">
-            <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm mb-1">
-                <i class="fa-solid fa-check text-green-500"></i>
-            </div>
-            <p class="text-[10px] font-bold text-green-700 max-w-[150px] truncate" id="file-name">file.zip</p>
-        </div>
-    </div>
-</div>
 
                     <div class="pt-3 border-t border-slate-100">
                         <div class="flex justify-between items-center mb-2">
@@ -183,7 +193,6 @@
                         </div>
 
                         <div class="relative flex items-center gap-3 p-2.5 bg-slate-50 border border-slate-200 rounded-xl overflow-hidden group hover:border-blue-300 transition">
-                            
                             <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-slate-400 shadow-sm shrink-0 relative overflow-hidden">
                                 <i id="trailer-icon" class="fa-solid fa-play ml-0.5"></i>
                                 <video id="preview-trailer" class="absolute inset-0 w-full h-full object-cover hidden"></video>
@@ -201,32 +210,62 @@
                             <input type="file" id="inp-trailer" accept="video/mp4,video/quicktime" class="absolute inset-0 opacity-0 cursor-pointer z-20">
                         </div>
                     </div>
+                </div>
 
+                <div id="section-audiobook" class="hidden bg-white p-4 rounded-2xl border border-slate-200 shadow-sm border-l-4 border-l-teal-500">
+                    <div class="mb-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wide">Audio Episodes <span class="text-red-500">*</span></h3>
+                            <span class="text-[9px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">MP3, WAV</span>
+                        </div>
+                        
+                        <div id="episodes-container" class="space-y-3">
+                            <div class="episode-row border border-slate-200 p-3 rounded-xl bg-slate-50 relative group">
+                                <div class="flex justify-between items-center mb-2">
+                                    <input type="text" placeholder="Episode 1 Title" class="ep-title w-full bg-white border border-slate-200 rounded-lg p-2 text-xs font-bold text-slate-800 outline-none focus:border-teal-400 mr-2">
+                                </div>
+                                <div class="relative w-full h-12 bg-white border border-dashed border-teal-200 rounded-lg flex items-center justify-center cursor-pointer hover:bg-teal-50 transition overflow-hidden">
+                                    <input type="file" accept="audio/*" class="ep-file absolute inset-0 opacity-0 cursor-pointer z-10 w-full">
+                                    <div class="flex items-center gap-2 text-teal-600">
+                                        <i class="fa-solid fa-file-audio text-sm"></i>
+                                        <span class="text-[10px] font-bold">Select Audio File</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="button" id="btn-add-episode" class="mt-3 w-full py-2 border-2 border-dashed border-slate-300 rounded-xl text-[10px] font-bold text-slate-500 hover:text-teal-600 hover:border-teal-300 hover:bg-teal-50 transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-plus"></i> Add Another Episode
+                        </button>
+                    </div>
+                    <div>
+                        <p class="text-[9px] font-bold text-teal-700 bg-teal-50 p-2 rounded-lg"><i class="fa-solid fa-shield-halved mr-1 text-teal-500"></i> Audio is encrypted and plays securely in the Interkun Player. It cannot be downloaded.</p>
+                    </div>
                 </div>
 
                 <div id="section-webinar" class="hidden bg-white p-4 rounded-2xl border border-slate-200 shadow-sm border-l-4 border-l-purple-500">
-    <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wide mb-3">Event Info</h3>
-    
-    <div class="grid grid-cols-2 gap-3 mb-3">
-        <div>
-            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Date</label>
-            <input type="datetime-local" id="inp-datetime" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold outline-none focus:border-purple-400 transition">
-        </div>
-        <div>
-            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Seats</label>
-            <input type="number" id="inp-seats" placeholder="100" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold outline-none focus:border-purple-400 transition">
-        </div>
-    </div>
+                    <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wide mb-3">Event Info</h3>
+                    
+                    <div class="grid grid-cols-2 gap-3 mb-3">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Date</label>
+                            <input type="datetime-local" id="inp-datetime" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold outline-none focus:border-purple-400 transition">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Seats</label>
+                            <input type="number" id="inp-seats" placeholder="100" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold outline-none focus:border-purple-400 transition">
+                        </div>
+                    </div>
 
-    <div>
-        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Meeting Link (Google/Meet)</label>
-        <div class="relative">
-            <i class="fa-solid fa-link absolute left-2.5 top-2.5 text-slate-400 text-[10px]"></i>
-            <input type="url" id="inp-meet-link" placeholder="https://Google.us/j/12345..." class="w-full pl-7 pr-2 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-800 outline-none focus:border-purple-400 transition">
-        </div>
-        <p class="text-[8px] font-bold text-purple-500 mt-1 uppercase tracking-wide">Buyers get this link automatically after purchase.</p>
-    </div>
-</div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Meeting Link (Google/Meet)</label>
+                        <div class="relative">
+                            <i class="fa-solid fa-link absolute left-2.5 top-2.5 text-slate-400 text-[10px]"></i>
+                            <input type="url" id="inp-meet-link" placeholder="https://meet.google.com/abc-xyz..." class="w-full pl-7 pr-2 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-800 outline-none focus:border-purple-400 transition">
+                        </div>
+                        <p class="text-[8px] font-bold text-purple-500 mt-1 uppercase tracking-wide">Buyers get this link automatically after purchase.</p>
+                    </div>
+                </div>
 
             </div>
 
@@ -239,7 +278,7 @@
                         <input type="number" id="inp-price" required placeholder="0" class="w-full pl-6 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-black text-lg text-slate-800 outline-none focus:ring-2 focus:ring-slate-900 transition">
                     </div>
                     <p class="text-[9px] text-slate-400 mt-2 font-bold flex justify-between">
-                        <span>Platform Fee</span> <span>10%</span>
+                        <span>Platform Fee</span> <span>0% (Limited Time)</span>
                     </p>
                 </div>
 
@@ -253,6 +292,21 @@
                         </div>
                         <input type="file" id="inp-cover" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer z-10">
                     </div>
+                </div>
+
+                <div id="section-intro-audio" class="hidden bg-white p-4 rounded-2xl border border-slate-200 shadow-sm border-l-4 border-l-slate-800">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase">Feed Preview Audio</label>
+                        <span class="text-[8px] font-bold text-slate-400">Max 2 Min</span>
+                    </div>
+                    <div class="relative w-full h-14 bg-slate-50 border-2 border-dashed border-slate-300 rounded-xl flex items-center justify-center cursor-pointer hover:bg-slate-100 transition group overflow-hidden">
+                        <input type="file" id="inp-intro-audio" accept="audio/*" class="absolute inset-0 opacity-0 cursor-pointer z-10">
+                        <div class="flex items-center gap-2 text-slate-500 group-hover:text-slate-800 transition">
+                            <i class="fa-solid fa-music text-sm"></i>
+                            <span class="text-[10px] font-bold">Select Intro Audio</span>
+                        </div>
+                    </div>
+                    <p class="text-[8px] font-bold text-slate-400 mt-2">This plays on the Social Feed timeline before they buy.</p>
                 </div>
 
                 <button type="submit" id="btn-submit" class="w-full py-3.5 bg-slate-900 text-white rounded-xl font-bold text-xs shadow-xl hover:bg-slate-800 transition flex items-center justify-center gap-2">
