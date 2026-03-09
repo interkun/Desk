@@ -65,17 +65,23 @@ window.selectType = (type) => {
     document.getElementById('view-form').classList.remove('hidden');
     document.getElementById('step-indicator').innerText = "Step 2 of 2";
 
-    const titles = { 'call': '1:1 Call', 'dm': 'Priority DM', 'digital': 'Digital File', 'webinar': 'Webinar' };
+    //  NAYA: 'audiobook' add kiya gaya hai
+    const titles = { 'call': '1:1 Call', 'dm': 'Priority DM', 'digital': 'Digital File', 'webinar': 'Webinar', 'audiobook': 'Audio Course / Book' };
     document.getElementById('editor-heading').innerText = state.mode === 'edit' ? 'Edit Product' : `New ${titles[type]}`;
     document.getElementById('editor-badge').innerText = type.toUpperCase();
 
-    ['call', 'dm', 'digital', 'webinar'].forEach(t => {
+    // Sections hide/show logic
+    ['call', 'dm', 'digital', 'webinar', 'audiobook'].forEach(t => {
         const el = document.getElementById(`section-${t}`);
         if(el) el.classList.add('hidden');
     });
     
     const activeSection = document.getElementById(`section-${type}`);
     if(activeSection) activeSection.classList.remove('hidden');
+
+    // Naya feature: Har type mein Intro Audio ka option dikhana
+    const introAudioSection = document.getElementById('section-intro-audio');
+    if(introAudioSection) introAudioSection.classList.remove('hidden');
 
     if(state.mode === 'new') {
         document.getElementById('publish-form').reset();
@@ -108,7 +114,7 @@ async function loadForEdit(id) {
             document.getElementById('preview-cover').classList.remove('hidden');
         }
 
-        // 🚀 NAYA: Loading Calendar Data
+        // ðŸš€ NAYA: Loading Calendar Data
         if(data.type === 'call') {
             setValue('inp-duration', data.duration);
             if(data.availability) {
@@ -188,7 +194,7 @@ function setupListeners() {
         });
     }
 
-    // Main File Upload Listener
+    // Main File Upload Listener (Digital Products)
     const inpFile = document.getElementById('inp-file');
     if(inpFile) {
         inpFile.addEventListener('change', (e) => {
@@ -207,20 +213,67 @@ function setupListeners() {
         });
     }
 
-    // 🚀 CALENDAR DAYS BUTTON LOGIC (Ab yeh perfectly work karega)
+    //  NAYA: Audiobook Episode File Change Listener (For default 1st episode)
+    const firstEpInput = document.querySelector('.ep-file');
+    if(firstEpInput) {
+        firstEpInput.addEventListener('change', (e) => {
+            if(e.target.files[0]) {
+                const textSpan = e.target.parentElement.querySelector('span');
+                textSpan.innerText = e.target.files[0].name;
+            }
+        });
+    }
+
+    //  NAYA: Add Episode Button Logic
+    const btnAddEpisode = document.getElementById('btn-add-episode');
+    if(btnAddEpisode) {
+        btnAddEpisode.addEventListener('click', () => {
+            const container = document.getElementById('episodes-container');
+            const epCount = container.querySelectorAll('.episode-row').length + 1;
+            
+            const row = document.createElement('div');
+            row.className = 'episode-row border border-slate-200 p-3 rounded-xl bg-slate-50 relative group mt-3';
+            row.innerHTML = `
+                <div class="flex justify-between items-center mb-2">
+                    <input type="text" placeholder="Episode ${epCount} Title" class="ep-title w-full bg-white border border-slate-200 rounded-lg p-2 text-xs font-bold text-slate-800 outline-none focus:border-teal-400 mr-2">
+                    <button type="button" class="text-red-500 hover:text-red-700 font-bold px-2 remove-ep"><i class="fa-solid fa-trash"></i></button>
+                </div>
+                <div class="relative w-full h-12 bg-white border border-dashed border-teal-200 rounded-lg flex items-center justify-center cursor-pointer hover:bg-teal-50 transition overflow-hidden">
+                    <input type="file" accept="audio/*" class="ep-file absolute inset-0 opacity-0 cursor-pointer z-10 w-full">
+                    <div class="flex items-center gap-2 text-teal-600">
+                        <i class="fa-solid fa-file-audio text-sm"></i>
+                        <span class="text-[10px] font-bold ep-file-text">Select Audio File</span>
+                    </div>
+                </div>
+            `;
+            container.appendChild(row);
+
+            // Remove button logic
+            row.querySelector('.remove-ep').addEventListener('click', () => row.remove());
+
+            // File input logic for new rows
+            const fileInput = row.querySelector('.ep-file');
+            const fileText = row.querySelector('.ep-file-text');
+            fileInput.addEventListener('change', (e) => {
+                if(e.target.files[0]) {
+                    fileText.innerText = e.target.files[0].name;
+                }
+            });
+        });
+    }
+
+    //  CALENDAR DAYS BUTTON LOGIC
     const dayBtns = document.querySelectorAll('.day-btn');
     const inpDays = document.getElementById('inp-days');
     
     dayBtns.forEach(btn => {
         btn.addEventListener('click', () => {
-            // Colors toggle karna
             btn.classList.toggle('bg-orange-500');
             btn.classList.toggle('text-white');
             btn.classList.toggle('border-orange-500');
             btn.classList.toggle('bg-white');
             btn.classList.toggle('text-slate-500');
             
-            // Jo select huye hain unka array banakar hidden input me dalna
             const selected = Array.from(document.querySelectorAll('.day-btn.bg-orange-500'))
                                   .map(b => parseInt(b.getAttribute('data-day')));
                                   
@@ -230,7 +283,7 @@ function setupListeners() {
 }
 
 // =========================================================
-//  FAST BACKGROUND SUBMIT LOGIC (YouTube Style)
+//   FAST BACKGROUND SUBMIT LOGIC (YouTube Style)
 // =========================================================
 function handleSubmit(e) {
     e.preventDefault();
@@ -244,19 +297,35 @@ function handleSubmit(e) {
         if(isNaN(price) || price < 0) throw new Error("Invalid Price.");
 
         let category = 'General';
-        if (state.type === 'digital') {
+        if (state.type === 'digital' || state.type === 'audiobook') {
             category = getValue('inp-category');
-            if (!category) throw new Error("Please select a valid category.");
+            if (!category && state.type === 'digital') throw new Error("Please select a valid category.");
         }
 
-        const coverInput = document.getElementById('inp-cover').files[0];
-        const fileInput = document.getElementById('inp-file').files[0];
+        // 1. Inputs Capture Karna
+        const coverInput = document.getElementById('inp-cover')?.files[0];
+        const fileInput = document.getElementById('inp-file')?.files[0];
         const trailerInput = document.getElementById('inp-trailer')?.files[0]; 
+        const introAudioInput = document.getElementById('inp-intro-audio')?.files[0];
 
-        if (state.type === 'digital' && state.mode === 'new' && !fileInput) {
+        //  NAYA: Audiobooks ke liye multiple episodes capture karna
+        let rawEpisodes = [];
+        if (state.type === 'audiobook') {
+            document.querySelectorAll('.episode-row').forEach((row, index) => {
+                const epTitle = row.querySelector('.ep-title').value || `Episode ${index + 1}`;
+                const epFile = row.querySelector('.ep-file').files[0];
+                if (epFile) {
+                    rawEpisodes.push({ title: epTitle, file: epFile });
+                }
+            });
+            if (rawEpisodes.length === 0 && state.mode === 'new') {
+                throw new Error("Audiobooks require at least one episode with an audio file.");
+            }
+        } else if (state.type === 'digital' && state.mode === 'new' && !fileInput) {
             throw new Error("Digital products require a main file (PDF/ZIP).");
         }
 
+        // 3. Payload Banana
         const payload = {
             sellerId: state.user.uid,
             type: state.type,
@@ -266,7 +335,7 @@ function handleSubmit(e) {
             updatedAt: serverTimestamp()
         };
 
-        // 🚀 NAYA: Advanced Availability Logic
+        // 4. Type-Specific Logic
         if(state.type === 'call') {
             payload.duration = Number(getValue('inp-duration')); 
             payload.platform = 'meet';
@@ -285,25 +354,40 @@ function handleSubmit(e) {
             payload.responseTime = Number(getValue('inp-response-time')); 
             payload.msgLimit = 500; 
         }
-        if(state.type === 'digital') { payload.category = category; }
+        if(state.type === 'digital' || state.type === 'audiobook') { 
+            payload.category = category || 'General'; 
+        }
         if(state.type === 'webinar') {
             payload.scheduledAt = getValue('inp-datetime');
             payload.maxSeats = Number(getValue('inp-seats'));
             payload.meetLink = getValue('inp-meet-link');
         }
 
-        runBackgroundUploadAndSave(payload, coverInput, fileInput, trailerInput, state.mode, state.docId);
+        // Temporary save episodes in payload for the worker to process
+        if(state.type === 'audiobook') {
+            payload.rawEpisodes = rawEpisodes;
+        }
+
+        // Submit state lock karna taki double click na ho
+        state.isSubmitting = true;
+        
+        // Background Upload Start
+        runBackgroundUploadAndSave(payload, coverInput, fileInput, trailerInput, introAudioInput, null, state.mode, state.docId);
+        
         showToast("Publishing in background... You can continue working.", "success");
         window.location.hash = '#content'; 
 
     } catch(err) {
         showToast(err.message, "error");
+        state.isSubmitting = false;
     }
 }
 
-// --- THE BACKGROUND ENGINE ---
-async function runBackgroundUploadAndSave(payload, coverInput, fileInput, trailerInput, mode, editDocId) {
-    // Progress Tracker UI banayein
+// =========================================================
+//   THE BACKGROUND ENGINE (Uploads + DB Save + Typesense)
+// =========================================================
+async function runBackgroundUploadAndSave(payload, coverInput, fileInput, trailerInput, introAudioInput, mainAudioInput, mode, editDocId) {
+    // Progress Tracker UI
     const progressId = `upload-${Date.now()}`;
     createFloatingProgressUI(progressId, payload.title);
 
@@ -311,27 +395,61 @@ async function runBackgroundUploadAndSave(payload, coverInput, fileInput, traile
         let coverUrl = state.files.cover;     
         let fileUrl = state.files.mainFile;   
         let trailerUrl = state.files.trailer; 
+        let introAudioUrl = state.files.introAudio || null; 
 
-        //  NAYA COMPRESSION LOGIC 
+        // 1. Cover Image Upload (With Compression)
         if(coverInput) {
             updateProgressUI(progressId, 'Compressing Image...', 5);
-            
-            // Image ko 800x800 aur 70% quality par compress karna
             const compressedCover = await compressImage(coverInput, 800, 800, 0.7);
             
             updateProgressUI(progressId, 'Uploading Cover...', 10);
             coverUrl = await uploadViaWorkerWithProgress(compressedCover, "covers", (pct) => {
-                updateProgressUI(progressId, `Uploading Cover (${pct}%)`, 10 + (pct * 0.2)); 
+                updateProgressUI(progressId, `Uploading Cover (${pct}%)`, 10 + (pct * 0.1)); 
             }); 
         }
 
-        if(payload.type === 'digital' && fileInput) {
-            updateProgressUI(progressId, 'Uploading Main File...', 30);
-            fileUrl = await uploadViaWorkerWithProgress(fileInput, "secure-files", (pct) => {
-                updateProgressUI(progressId, `Uploading Main File (${pct}%)`, 30 + (pct * 0.5)); 
+        // 2. Intro Audio Upload
+        if(introAudioInput) {
+            updateProgressUI(progressId, 'Uploading Intro Audio...', 25);
+            introAudioUrl = await uploadViaWorkerWithProgress(introAudioInput, "audio-previews", (pct) => {
+                updateProgressUI(progressId, `Uploading Intro (${pct}%)`, 25 + (pct * 0.15)); 
             });
         }
 
+        // 3. Digital File Upload
+        if(payload.type === 'digital' && fileInput) {
+            updateProgressUI(progressId, 'Uploading Main File...', 45);
+            fileUrl = await uploadViaWorkerWithProgress(fileInput, "secure-files", (pct) => {
+                updateProgressUI(progressId, `Uploading Main File (${pct}%)`, 45 + (pct * 0.3)); 
+            });
+        }
+
+        //  NAYA: Multiple Episodes Upload Logic
+        if(payload.type === 'audiobook' && payload.rawEpisodes && payload.rawEpisodes.length > 0) {
+            let uploadedChapters = [];
+            const totalEps = payload.rawEpisodes.length;
+            const progressPerEp = 35 / totalEps; // Reserve 35% of progress bar for episodes
+            
+            for(let i = 0; i < totalEps; i++) {
+                let ep = payload.rawEpisodes[i];
+                let baseProgress = 45 + (i * progressPerEp);
+                
+                updateProgressUI(progressId, `Uploading ${ep.title}...`, baseProgress); 
+                
+                let epUrl = await uploadViaWorkerWithProgress(ep.file, "secure-audio", (pct) => {
+                    let currentOverall = baseProgress + ((pct / 100) * progressPerEp);
+                    updateProgressUI(progressId, `Uploading ${ep.title} (${pct}%)`, currentOverall); 
+                });
+                
+                uploadedChapters.push({ title: ep.title, fileUrl: epUrl });
+            }
+            
+            // Attach chapters to payload and delete the raw files array
+            payload.chapters = uploadedChapters;
+            delete payload.rawEpisodes;
+        }
+
+        // 5. Digital Trailer Upload
         if(payload.type === 'digital' && trailerInput) {
             updateProgressUI(progressId, 'Uploading Trailer...', 80);
             trailerUrl = await uploadViaWorkerWithProgress(trailerInput, "trailers", (pct) => {
@@ -339,30 +457,26 @@ async function runBackgroundUploadAndSave(payload, coverInput, fileInput, traile
             });
         }
 
-        // Apply URLs to payload
+        // Apply Generated URLs to Payload
         payload.coverImage = coverUrl || null;
+        payload.introAudioUrl = introAudioUrl || null; 
+        
         if(payload.type === 'digital') {
             payload.fileUrl = fileUrl || null;
             payload.trailerUrl = trailerUrl || null;
         }
 
-        // ==========================================
-        // 🚀 NAYA: AUTO-GENERATE GOOGLE MEET LINK (WEBINAR)
-        // ==========================================
+        // 6. AUTO-GENERATE GOOGLE MEET LINK (WEBINAR)
         if (payload.type === 'webinar' && !payload.meetLink) {
             updateProgressUI(progressId, 'Generating Meet Link...', 90);
-            
             try {
-                // 1. Firebase se creator ka Refresh Token nikalna
                 const userDoc = await getDoc(doc(db, "users", payload.sellerId));
                 const userData = userDoc.data();
                 
                 if (userData && userData.googleRefreshToken) {
-                    // 2. Start Date aur End Date (1 ghante ki meeting) set karna
                     const startTime = new Date(payload.scheduledAt);
-                    const endTime = new Date(startTime.getTime() + 60 * 60 * 1000); // 1 Hour duration
+                    const endTime = new Date(startTime.getTime() + 60 * 60 * 1000); 
 
-                    // 3. Worker ko call karna
                     const meetReq = await fetch("https://googlemeet.interkunhq.workers.dev/create-meeting", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
@@ -376,28 +490,24 @@ async function runBackgroundUploadAndSave(payload, coverInput, fileInput, traile
                     });
 
                     const meetRes = await meetReq.json();
-                    
                     if (meetRes.success) {
-                        // 4. Link ban gaya! Ise payload me daal do taaki database me save ho jaye
                         payload.meetLink = meetRes.meetLink;
                     } else {
                         throw new Error(meetRes.error || "Failed to generate Meet link");
                     }
                 } else {
-                    // Agar Google account connect nahi hai aur link bhi nahi daali
-                    throw new Error("Google Meet not connected! Please add a meeting link manually.");
+                    throw new Error("Google Meet not connected!");
                 }
             } catch (meetErr) {
-                throw new Error(meetErr.message); // Error aane par publish rok do
+                throw new Error(meetErr.message);
             }
         }
-        // ==========================================
 
         updateProgressUI(progressId, 'Saving to Database...', 95);
 
         let productId = editDocId;
 
-        // Save to Firebase
+        // 7. Save to Firebase
         if(mode === 'edit') {
             await updateDoc(doc(db, "products", editDocId), payload);
         } else {
@@ -410,7 +520,7 @@ async function runBackgroundUploadAndSave(payload, coverInput, fileInput, traile
             productId = docRef.id; 
         }
 
-        // Save to Typesense (Search Engine)
+        // 8. Save to Typesense (Search Engine Sync)
         try {
             const SEARCH_WORKER_URL = "https://search.interkunhq.workers.dev"; 
             const searchData = {
@@ -432,36 +542,44 @@ async function runBackgroundUploadAndSave(payload, coverInput, fileInput, traile
             console.error("Search Engine sync failed", searchErr);
         }
 
-        // 100% Done
+        // 100% Done -> Unlock Submit Button
         updateProgressUI(progressId, 'Published Successfully! ', 100);
-        setTimeout(() => removeProgressUI(progressId), 4000); // 4 sec baad popup hata do
+        state.isSubmitting = false;
+        setTimeout(() => removeProgressUI(progressId), 4000); 
 
     } catch(err) {
         console.error("Background Process Error:", err);
         updateProgressUI(progressId, 'Upload Failed ', 100, true);
+        state.isSubmitting = false;
         setTimeout(() => removeProgressUI(progressId), 5000);
     }
 }
 
 // =========================================================
-//  XHR UPLOADER (FOR EXACT 1%, 2% PERCENTAGE)
+//   XHR UPLOADER (FOR EXACT 1%, 2% PERCENTAGE)
 // =========================================================
 async function uploadViaWorkerWithProgress(file, folderName, onProgress) {
     if (!file) return null;
 
-    const isPrivate = folderName === "secure-files"; 
-    const safeFileName = `${folderName}/${Date.now()}-${file.name.replace(/\s+/g, '-')}`;
+    // FIX 1:            AWS   
+    const cleanName = file.name.replace(/[^a-zA-Z0-9.\-]/g, '_');
+    const safeFileName = `${folderName}/${Date.now()}-${cleanName}`;
+    
+    // FIX 2:     type     (Blank  ),     
+    const fileType = file.type || 'audio/mpeg';
 
     try {
-        // Step 1: Get presigned URL from Worker (Very fast)
-        const res = await fetch(`${UPLOADER_WORKER_URL}/upload?fileName=${encodeURIComponent(safeFileName)}&fileType=${encodeURIComponent(file.type)}`);
+        // Step 1: Get presigned URL from Worker
+        const res = await fetch(`${UPLOADER_WORKER_URL}/upload?fileName=${encodeURIComponent(safeFileName)}&fileType=${encodeURIComponent(fileType)}`);
         const { uploadUrl, publicUrl } = await res.json();
 
         // Step 2: Upload directly to AWS S3 using XHR to track progress
         return new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
             xhr.open("PUT", uploadUrl, true);
-            xhr.setRequestHeader('Content-Type', file.type);
+            
+            //   fileType    
+            xhr.setRequestHeader('Content-Type', fileType);
             
             xhr.upload.onprogress = (event) => {
                 if (event.lengthComputable) {
@@ -539,7 +657,7 @@ function updateProgressUI(id, statusText, percent, isError = false) {
 }
 
 // =========================================================
-//  IMAGE COMPRESSOR (Client-Side)
+//  IMAGE COMPRESSOR (Client-Side)
 // =========================================================
 async function compressImage(file, maxWidth = 800, maxHeight = 800, quality = 0.7) {
     return new Promise((resolve) => {
